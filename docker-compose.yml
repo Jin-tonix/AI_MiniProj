@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  backend:
+    image: mini_python  # 백엔드 이미지
+    container_name: api-backend
+    ports:
+      - "8000:80"  # 호스트의 8000번 포트를 컨테이너의 80번 포트에 매핑
+    networks:
+      - my_network  # backend 서비스가 연결될 네트워크 설정
+    environment:
+      - PYTHONUNBUFFERED=1  # 로깅을 실시간으로 보기 위해 Python 버퍼링 끄기
+      - FRONT_HOST=localhost
+
+  frontend:
+    image: mini_react_front # 프론트엔드 이미지
+    container_name: frontend
+    ports:
+      - "3000:80"  # 호스트의 3000번 포트를 컨테이너의 80번 포트에 매핑
+    networks:
+      - my_network  # frontend 서비스가 연결될 네트워크 설정
+    depends_on:
+      - backend  # frontend가 backend에 의존하도록 설정하여 backend가 먼저 시작되게 함
+    environment:
+      - REACT_APP_API_URL=localhost  # 백엔드 컨테이너의 주소
+      - REACT_APP_BACKEND_PORT=8000
+
+networks:
+  my_network:
+    driver: bridge  # 프론트엔드와 백엔드를 연결하는 bridge 네트워크 생성
